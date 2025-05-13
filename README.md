@@ -38,20 +38,44 @@ A full-stack To-Do List application with:
 - **client/**: React app (components, context, services)
 - **.env.example**: sample env vars
 
+## 🛠️ Changes Made in the Todo App
 
-Changes made by me in the todo app
-1.	Added Register option in login form. -  In the LoginForm.jsx added <p className='flex justify-center'>Don't have an account? <a href='/register'><span className='mx-1 underline text-blue'>Sign up</span></a></p> at line no. 46
+### 1. 🔐 Register Option Added in Login Form
 
-2.	On login success navigated to dashboard page. - installed react-router-dom, In the LoginForm.jsx added line no. 3,7, 13-24 and in AuthContext.js
-added return res in line no. 45 in login function
-LoginForm.jsx
-1.import {useNavigate} from 'react-router-dom';
-2.const navigate = useNavigate();
-3.const submit = async e => {
+* **File:** `LoginForm.jsx`
+* **Description:** Added a link to the register page below the login form.
+* **Code Added (Line 46):**
+
+  ```jsx
+  <p className='flex justify-center'>
+    Don't have an account? 
+    <a href='/register'>
+      <span className='mx-1 underline text-blue'>Sign up</span>
+    </a>
+  </p>
+  ```
+
+---
+
+### 2. ✅ Navigate to Dashboard on Successful Login
+
+* **Installed:** `react-router-dom`
+* **Files Modified:** `LoginForm.jsx`, `AuthContext.js`
+
+#### `LoginForm.jsx`
+
+* **Lines Added:**
+
+  ```jsx
+  import { useNavigate } from 'react-router-dom'; // (Line 3)
+
+  const navigate = useNavigate(); // (Line 7)
+
+  const submit = async e => {
     e.preventDefault();
-     try {
-      const response =  await login(form.email, form.password);
-      console.log("resp "+JSON.stringify(response))
+    try {
+      const response = await login(form.email, form.password);
+      console.log("resp " + JSON.stringify(response));
       if (response.status == 200) {
         navigate('/');
       } else {
@@ -62,39 +86,81 @@ LoginForm.jsx
       alert('Invalid credentials or server error');
     }
   };
+  ```
 
-  AuthContext.js
-   const login = async (email, password) => {
+#### `AuthContext.js`
+
+* **Updated `login` function (Line 45):**
+
+  ```js
+  const login = async (email, password) => {
     const res = await apiLogin({ email, password });
     localStorage.setItem('token', 'Bearer ' + res.data.token);
     dispatch({ type: 'LOGIN', payload: res.data });
     return res;
   };
+  ```
 
-3.	Added logout option in dashboard page. - in App.jsx added line no. 27 , 36-39, 54-57
-App.jsx
- const {logout} = useContext(AuthContext);
-   const logoutClick = async e=> {
+---
+
+### 3. 🚪 Logout Option on Dashboard Page
+
+* **File Modified:** `App.jsx`
+
+#### `App.jsx`
+
+* **Lines Added:**
+
+  ```jsx
+  const { logout } = useContext(AuthContext); // (Line 27)
+
+  const logoutClick = async e => { // (Line 36)
     e.preventDefault();
-     await logout()
-  }
-   <div className='flex '>
-        <DarkModeToggle />
-        <button className='border-2 border-black rounded p-2 mx-4' onClick={(e)=>logoutClick(e)}>Logout</button>
-   </div>
+    await logout();
+  };
 
-4.	In add task feature, on selecting the first project it was throwing error so resolved the dropdown issue. - in TaskForm.jsx updated line no. 21
- changed to options: ['',  ...projects.map(p => p._id)],
- in App.jsx on taskform save method added a check for project (line no. 80-91)
-   onSave={data =>{
-              if(data.project==''){
-                alert('project is required!')
-              }else{
-              console.log("data "+JSON.stringify(data))
-              addTask(data).then(res => {
-                dispatch({ type: 'ADD_TASK', payload: res.data });
-                setShowForm(false);
-              })
-            }
-            }
-            }
+  // In JSX (Line 54):
+  <div className='flex '>
+    <DarkModeToggle />
+    <button 
+      className='border-2 border-black rounded p-2 mx-4' 
+      onClick={(e) => logoutClick(e)}
+    >
+      Logout
+    </button>
+  </div>
+  ```
+
+---
+
+### 4. 🛠️ Fixed Add Task Dropdown Issue (Project Selection)
+
+* **File Modified:** `TaskForm.jsx`
+* **Fix:** Resolved error on selecting the first project by updating the dropdown options.
+
+#### `TaskForm.jsx`
+
+* **Line 21 Updated To:**
+
+  ```js
+  options: ['', ...projects.map(p => p._id)],
+  ```
+
+#### `App.jsx` (TaskForm save logic)
+
+* **Added project validation check (Line 80-91):**
+
+  ```jsx
+  onSave={data => {
+    if (data.project === '') {
+      alert('Project is required!');
+    } else {
+      console.log("data " + JSON.stringify(data));
+      addTask(data).then(res => {
+        dispatch({ type: 'ADD_TASK', payload: res.data });
+        setShowForm(false);
+      });
+    }
+  }}
+  ```
+
